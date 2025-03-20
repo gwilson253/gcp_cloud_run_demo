@@ -1,0 +1,25 @@
+steps:
+  # Build Docker image and push to Artifact Registry
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["build", "-t", "us-west1-docker.pkg.dev/$PROJECT_ID/my-repo/my-job", "."]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args: ["push", "us-west1-docker.pkg.dev/$PROJECT_ID/my-repo/my-job"]
+
+  # Deploy to Cloud Run
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    args:
+      - "gcloud"
+      - "run"
+      - "deploy"
+      - "my-job-service"
+      - "--image"
+      - "us-west1-docker.pkg.dev/$PROJECT_ID/my-repo/my-job"
+      - "--region"
+      - "us-west1"
+      - "--platform"
+      - "managed"
+      - "--allow-unauthenticated"
+
+images:
+  - "us-west1-docker.pkg.dev/$PROJECT_ID/my-repo/my-job"
